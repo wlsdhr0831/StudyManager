@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
 
 @Controller
 @RequestMapping("/users")
@@ -34,7 +35,9 @@ public class AccountController {
 
         String returnUrl = "redirect:/";
         if(loginUser != null) {
-            request.getSession().setAttribute("me", loginUser);
+            HttpSession session = request.getSession();
+            session.setMaxInactiveInterval(0);
+            session.setAttribute("me", loginUser);
         }else {
             returnUrl = "redirect:/users/login";
         }

@@ -3,6 +3,7 @@ package com.bigescape.manager.user;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class AccountService {
@@ -27,5 +28,9 @@ public class AccountService {
 
     public List<Account> findAll() {
         return accountRepository.findAll();
+    }
+
+    public Optional<Account> findByUsername(String username) {
+        return accountRepository.findById(username);
     }
 }

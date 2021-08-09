@@ -74,6 +74,7 @@ function appendCards(template, accounts) {
             additional.find(".switch").click(function (event) {
                event.stopPropagation();
             });
+
             const toggleBtn = additional.find("#toggle_" + myName);
             toggleBtn.change(function () {
                doFire();
@@ -104,6 +105,12 @@ function appendFires(template, fires) {
 }
 
 function appendFire(template, fire, username) {
+   if(fire.end == null) {
+      $("#additional_" + username).prepend(startedBadge(username, fire.fireTime));
+
+      return;
+   }
+
    const startTime = new Date(fire.fireTime);
    const endTime = new Date(fire.end.fireTime);
    const timeDiff = endTime - startTime;
@@ -141,7 +148,7 @@ let loginUser = null;
 function connect() {
    const socket = new SockJS("/connect");
    stompClient = Stomp.over(socket);
-   stompClient.connect({}, onConnected, onError);
+   stompClient.connect({sender: loginUser}, onConnected, onError);
    stompClient.debug = null;
 }
 
@@ -157,17 +164,22 @@ function onError(error) {
 function onMessageReceived(payload) {
    payload = JSON.parse(payload.body);
 
+   const additional = $("#additional_" + payload.sender);
+
    if(payload.sender !== loginUser) {
       if (payload.fire.end == null) {
-         $("#additional_" + payload.sender).html(onBadge());
+         additional.html(onBadge());
       } else {
-         $("#additional_" + payload.sender).html(offBadge());
+         additional.html(offBadge());
       }
    }
    if(payload.fire.end != null) {
       loadTemplate("timeline-template.html", (fireTemplate) => {
          appendFire(fireTemplate, payload.fire, payload.sender);
+         $("#started_" + payload.sender).remove();
       });
+   }else {
+      additional.prepend(startedBadge(payload.sender, payload.fire.fireTime));
    }
 }
 
@@ -181,7 +193,7 @@ function send(data) {
 
 function switchButton(username) {
    return `
-      <label class="switch">
+      <label class="switch right">
          <input id="toggle_${username}" type="checkbox"/>
          <span class="slider round"></span>
       </label>
@@ -196,6 +208,13 @@ function onBadge() {
 function offBadge() {
    return `
     <span class="badge badge-secondary">Off</span>
+   `;
+}
+
+function startedBadge(username, time) {
+   const formatTime = moment(new Date(time)).format("HH:mm:ss");
+   return `
+   <span id="started_${username}" class="badge badge-info" style="margin-right: 15px">` + formatTime + ` ~ </span>
    `;
 }
 

@@ -31,7 +31,9 @@ public class AppConfig {
                 };
 
                 for (Account participant : participants) {
-                    accountService.save(participant);
+                    if(accountService.findByUsername(participant.getUsername()).isEmpty()) {
+                        accountService.save(participant);
+                    }
                 }
             }
         };

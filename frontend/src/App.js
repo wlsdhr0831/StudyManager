@@ -1,14 +1,14 @@
 import React, { useState } from 'react';
-import Main from './pages/main';
+import Main from './pages/main/main';
 import './App.css';
-import SignIn from './pages/signIn';
-import Setting from './pages/setting';
+import Sign from './pages/sign/sign';
+import Setting from './pages/setting/setting';
 
 const Modal = ({ closeModal, component }) => {
   return (
   <div className="modal-wrapper" sytle="display: none;">
     <div className="modal">
-      { component === 'sign' && <SignIn/> }
+      { component === 'sign' && <Sign/> }
       { component === 'setting' && <Setting/> }
       <div className="close-wrapper">
         <button onClick={() => closeModal()}>닫기</button>

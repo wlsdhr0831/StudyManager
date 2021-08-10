@@ -1,6 +1,6 @@
 import React from 'react';
 
-const SignIn = () => {
+const Sign = () => {
     return (
         <div>
             <input placeholder="NAME"/>
@@ -10,4 +10,4 @@ const SignIn = () => {
     )
 }
 
-export default SignIn;
+export default Sign;

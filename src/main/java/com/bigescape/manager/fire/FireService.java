@@ -19,7 +19,7 @@ public class FireService {
     }
 
     public List<Fire> getStartedListByFireDate(LocalDate fireDate) {
-        return fireRepository.findAllByFireDateAndFireType(fireDate, FireType.START);
+        return fireRepository.findAllByFireDateAndFireTypeAndEnd_IdNotNull(fireDate, FireType.START);
     }
 
     public Fire getLastFiredByName(String username) {

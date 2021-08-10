@@ -93,6 +93,21 @@ function appendCards(template, accounts) {
          }
          $("#others_cards").append(card);
       }
+
+      if(isToday) {
+         loadingAjax({
+            url: "/fires/last",
+            method: "GET",
+            data: {
+               username: account.username,
+            },
+            success(data) {
+               if (data.fireType === "START") {
+                  additional.prepend(startedBadge(account.username, data.fireTime));
+               }
+            },
+         })
+      }
    });
 }
 
@@ -105,12 +120,6 @@ function appendFires(template, fires) {
 }
 
 function appendFire(template, fire, username) {
-   if(fire.end == null) {
-      $("#additional_" + username).prepend(startedBadge(username, fire.fireTime));
-
-      return;
-   }
-
    const startTime = new Date(fire.fireTime);
    const endTime = new Date(fire.end.fireTime);
    const timeDiff = endTime - startTime;

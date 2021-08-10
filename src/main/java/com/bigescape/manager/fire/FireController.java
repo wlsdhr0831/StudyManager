@@ -76,4 +76,11 @@ public class FireController {
                 .owner(loginUser.getUsername())
                 .build());
     }
+
+    @GetMapping("/last")
+    public ResponseEntity getLastFired(String username) {
+        Fire lastFired = fireService.getLastFiredByName(username);
+
+        return ResponseEntity.ok(lastFired);
+    }
 }

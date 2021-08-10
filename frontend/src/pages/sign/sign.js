@@ -9,10 +9,19 @@ const Sign = () => {
     });
 
     const onKeyDown = (e) => {
-        if(e.keyCode === "13") submitSign();
+        if(e.keyCode === 13) submitSign();
     };
 
     const submitSign = () => {
+        if(userInfo.username === ''){
+            alert("이름을 입력하세요.");
+            return ;
+        }
+        if(userInfo.userPw === ''){
+            alert("비밀번호를 입력하세요.");
+            return ;
+        }
+
         console.log("로그인 요청", userInfo);
         // sign(userInfo);
     };

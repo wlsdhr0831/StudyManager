@@ -11,15 +11,15 @@ const Modal = ({ closeModal, component }) => {
       { component === 'sign' && <Sign/> }
       { component === 'setting' && <Setting/> }
       <div className="close-wrapper">
-        <button onClick={() => closeModal()}>닫기</button>
+        <button className="modal-btn" onClick={() => closeModal()}>✖</button>
       </div>
     </div>
   </div>)
 }
 
 const App = () => {
-  const [modal, setModal] = useState(false);
-  const [component, setComponent] = useState('');
+  const [modal, setModal] = useState(true);
+  const [component, setComponent] = useState('sign');
 
   const openModal = (name) => {
     setModal(true);

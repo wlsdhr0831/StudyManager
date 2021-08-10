@@ -1,0 +1,39 @@
+.sign{
+    width: 80%;
+    position: absolute;
+    transform: translate(-50%, -50%);
+    top: 50%;
+    left: 50%;
+}
+
+.sign input {
+    display: block;
+    width: 50%;
+    height: 30px;
+    padding: 10px 10px 0px 10px;
+    border: none;
+    border-bottom: 2px solid rgb(88, 180, 255);
+    margin-top: 20px;
+}
+
+.sign input:focus{
+    outline: none;
+}
+
+.sign button {
+    width: 55%;
+    height: 50px;
+    padding: 10px;
+    border: none;
+    border-radius: 10px;
+    background-color: rgb(88, 180, 255);
+    margin-top: 50px;
+    color: white;
+    font-size: 1.2rem;
+    font-weight: bold;
+}
+
+.sign button:hover {
+    background-color: rgb(0, 77, 165);
+    cursor: pointer;
+}

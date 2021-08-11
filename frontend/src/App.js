@@ -1,21 +1,7 @@
 import React, { useState } from 'react';
 import Main from './pages/main/main';
 import './App.css';
-import Sign from './pages/sign/sign';
-import Setting from './pages/setting/setting';
-
-const Modal = ({ closeModal, component }) => {
-  return (
-  <div className="modal-wrapper" sytle="display: none;">
-    <div className="modal">
-      { component === 'sign' && <Sign/> }
-      { component === 'setting' && <Setting/> }
-      <div className="close-wrapper">
-        <button className="modal-btn" onClick={() => closeModal()}>✖</button>
-      </div>
-    </div>
-  </div>)
-}
+import Modal from './pages/modal/modal';
 
 const App = () => {
   const [modal, setModal] = useState(true);

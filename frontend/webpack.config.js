@@ -11,7 +11,7 @@ module.exports = {
   },
   output: {
     path: path.join(__dirname, 'dist'),
-    filename: 'serengeti_chatbot_tts.js',
+    filename: 'exit.js',
   },
   module: {
     rules: [

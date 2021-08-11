@@ -4,8 +4,8 @@ import './App.css';
 import Modal from './pages/modal/modal';
 
 const App = () => {
-  const [modal, setModal] = useState(true);
-  const [component, setComponent] = useState('sign');
+  const [modal, setModal] = useState(false);
+  const [component, setComponent] = useState('');
 
   const openModal = (name) => {
     setModal(true);

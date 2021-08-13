@@ -16,7 +16,7 @@ const Progress = () => {
 
     return (
     <div className={styles.progress}>
-        <h2>이번 주 진행상황</h2>
+        <h2 className={styles.head}>이번 주 진행상황</h2>
         {
             data.map((item) => (
                 <ProgressItem data={item} key={item.name}/>

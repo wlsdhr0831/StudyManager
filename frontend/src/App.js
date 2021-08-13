@@ -18,7 +18,7 @@ const App = () => {
   }
 
   return (
-  <div id="app">
+  <>
     <div id="app_btn">
       <button onClick={() => openModal('setting')}>설정</button>
       <button onClick={() => openModal('sign')}>SIGN IN</button>
@@ -29,7 +29,7 @@ const App = () => {
             closeModal={closeModal} 
             component={component}/>
     }
-  </div>
+  </>
   );
 };
 

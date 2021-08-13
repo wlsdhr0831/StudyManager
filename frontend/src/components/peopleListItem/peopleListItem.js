@@ -12,7 +12,7 @@ const PeopleListItem = ({ data }) => {
 
     return (
         <div className={styles.list_item}>
-            {data.name}
+            <span className={styles.name}>{data.name}</span>
             <Switch
                 disabled={!data.fire}
                 checked={fire}
@@ -29,6 +29,7 @@ const PeopleListItem = ({ data }) => {
             <div className={styles.time_list}>
                 <TimeList/>
             </div>
+            <hr/>
         </div>
     );
 }

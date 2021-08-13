@@ -3,8 +3,16 @@
     width: 50%;
     height: 100%;
     float: right;
-    margin-top: 50px;
+    border: 2px solid rgb(161, 213, 255);
+    border-radius: 20px;
     /* background-color: aqua; */
+}
+
+.list .list_head{
+    padding-top: 10px;
+    height: 70px;
+    background-color: rgb(161, 213, 255);
+    border-radius: 15px 15px 0px 0px;
 }
 
 .list h2{
@@ -15,4 +23,9 @@
 .list span{
     cursor: pointer;
     font-size: 2rem;
+}
+
+.list hr{
+    margin-top: 20px;
+    border-color: rgb(161, 213, 255);
 }

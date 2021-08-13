@@ -5,7 +5,7 @@ import styles from './progressItem.module.css';
 const ProgressItem = ({ data }) => {
     return (
         <div className={styles.progress_item}>
-            <span>{data.name}</span>
+            <span className={styles.name}>{data.name}</span>
             <ProgressBar 
                 bgColor="#004da5"
                 baseBgColor="#58b4ff"

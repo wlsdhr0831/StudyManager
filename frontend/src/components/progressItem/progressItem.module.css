@@ -1,4 +1,17 @@
 .progress_item{
-    text-align: left;
     margin: 15px;
+}
+
+.progress_item .name{
+    font-size: 1.2rem;
+    margin-right: 10px;
+}
+
+.progress_item > div > div {
+    display: inline-block;
+}
+
+.progress_item > div > div > div{
+    display: inline-block;
+    float: left;
 }

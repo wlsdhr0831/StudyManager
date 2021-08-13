@@ -21,9 +21,11 @@ const PeopleList = ({ setDate, date }) => {
 
     return (
         <div className={styles.list}>
-            <span onClick={() => changeDate(-1)}>👈🏻</span>
-            <h2>{date.toDateString()}</h2>
-            <span onClick={() => changeDate(1)}>👉🏻</span>
+            <div className={styles.list_head}>
+                <span onClick={() => changeDate(-1)}>👈🏻</span>
+                <h2>{date.toDateString()}</h2>
+                <span onClick={() => changeDate(1)}>👉🏻</span>
+            </div>
             {
                 data.map((item) => (
                     <PeopleListItem key={item.name} data={item}/>

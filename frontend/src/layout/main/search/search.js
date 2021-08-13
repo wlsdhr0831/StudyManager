@@ -3,10 +3,10 @@ import CalendarList from '../../../components/calendar/calendar';
 import Progress from '../../../components/progress/progress';
 import styles from './search.module.css';
 
-const Search = () => {
+const Search = ({ date, changeDate }) => {
     return (
     <div className={styles.search}>
-        <CalendarList/>
+        <CalendarList date={date} changeDate={changeDate}/>
         <Progress/>
     </div>);
 }

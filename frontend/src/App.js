@@ -18,15 +18,17 @@ const App = () => {
   }
 
   return (
-  <div>
-    <button onClick={() => openModal('sign')}>SIGN IN</button>
-    <button onClick={() => openModal('setting')}>설정</button>
+  <div id="app">
+    <div id="app_btn">
+      <button onClick={() => openModal('setting')}>설정</button>
+      <button onClick={() => openModal('sign')}>SIGN IN</button>
+    </div>
+    <Main/>
     { modal 
       && <Modal 
             closeModal={closeModal} 
             component={component}/>
     }
-    <Main/>
   </div>
   );
 };

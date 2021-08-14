@@ -1,0 +1,12 @@
+.list_item{
+    margin: 20px 0px;
+}
+
+.list_item .name{
+    font-size: 1.5rem;
+    margin-right: 200px;
+}
+
+.list_item hr{
+    margin-top: 20px;
+}

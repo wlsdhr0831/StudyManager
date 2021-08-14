@@ -2,3 +2,28 @@
     margin: auto;
     text-align: center;
 }
+
+#app{
+    max-width: 800px;
+}
+
+#app_btn{
+    width: fit-content;
+    float: right;
+}
+
+#app_btn button{
+    border: 1px solid darkgray;
+    border-radius: 10px;
+    background-color: white;
+    width: 70px;
+    height: 40px;
+    margin: 10px 5px;
+}
+
+#app_btn button:hover{
+    cursor: pointer;
+    border: none;
+    color: white;
+    background-color: rgb(88, 180, 255);
+}

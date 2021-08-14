@@ -4,8 +4,8 @@ import './App.css';
 import Modal from './pages/modal/modal';
 
 const App = () => {
-  const [modal, setModal] = useState(true);
-  const [component, setComponent] = useState('sign');
+  const [modal, setModal] = useState(false);
+  const [component, setComponent] = useState('');
 
   const openModal = (name) => {
     setModal(true);
@@ -18,16 +18,18 @@ const App = () => {
   }
 
   return (
-  <div>
-    <button onClick={() => openModal('sign')}>SIGN IN</button>
-    <button onClick={() => openModal('setting')}>설정</button>
+  <>
+    <div id="app_btn">
+      <button onClick={() => openModal('setting')}>설정</button>
+      <button onClick={() => openModal('sign')}>SIGN IN</button>
+    </div>
+    <Main/>
     { modal 
       && <Modal 
             closeModal={closeModal} 
             component={component}/>
     }
-    <Main/>
-  </div>
+  </>
   );
 };
 

@@ -12,10 +12,10 @@ const PeopleListItem = ({ data }) => {
 
     return (
         <div className={styles.list_item}>
-            <span className={styles.name}>{data.name}</span>
+            <span className={styles.name}>{data.username}</span>
             <Switch
-                disabled={!data.fire}
-                checked={fire}
+                // disabled={data.username === '' ? true : false}
+                checked={data.fireState === 'START' ? true : false}
                 onChange={handleChange}
                 onColor="#58b4ff"
                 onHandleColor="#004da5"

@@ -1,16 +1,21 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import styles from './peopleList.module.css';
 import PeopleListItem from '../../../components/peopleListItem/peopleListItem';
+import { getFires } from '../../../api/api';
 
 const PeopleList = ({ setDate, date }) => {
-    const data = [
-        {'name': '김용욱', 'fire': true},
-        {'name': '노휘종', 'fire': false},
-        {'name': '성진옥', 'fire': false},
-        {'name': '정인균', 'fire': false},
-        {'name': '조희진', 'fire': false},
-        {'name': '허인', 'fire': false},
-    ];
+    const [list, setList] = useState([]);
+
+    useEffect(() => {
+        const params = date.getFullYear() + "-" 
+                        + ("0" + (1 + date.getMonth())).slice(-2) + "-" 
+                        + date.getDate();
+        const res = getFires(params)
+                    .then(res => res);
+        
+        console.log(res);
+        //setList(res);
+    }, [date]);
 
     const changeDate = ( dir ) => {
         setDate(new Date(
@@ -27,8 +32,8 @@ const PeopleList = ({ setDate, date }) => {
                 <span onClick={() => changeDate(1)}>👉🏻</span>
             </div>
             {
-                data.map((item) => (
-                    <PeopleListItem key={item.name} data={item}/>
+                list.accounts.map((account) => (
+                    <PeopleListItem key={account.name} data={account}/>
                 ))
             }
         </div>

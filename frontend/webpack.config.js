@@ -37,4 +37,12 @@ module.exports = {
       template: './public/index.html',
     }),
   ],
+  devServer: {
+    proxy: {
+        "/" : {
+            target: "http://tzf.iptime.org",
+            changeOrigin: true
+        }
+    }
+  }
 };

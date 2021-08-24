@@ -4,24 +4,35 @@ import PeopleListItem from '../../../components/peopleListItem/peopleListItem';
 import { getFires } from '../../../api/api';
 
 const PeopleList = ({ setDate, date }) => {
-    const [list, setList] = useState([]);
+    const [list, setList] = useState({
+        accounts: [],
+        fires: {}
+    });
+
+    const [dateDiff, setDateDiff] = useState(0);
 
     useEffect(() => {
+        getList();
+
+    }, [date]);
+
+    const getList = async () => {
         const params = date.getFullYear() + "-" 
                         + ("0" + (1 + date.getMonth())).slice(-2) + "-" 
                         + date.getDate();
-        const res = getFires(params)
+        const res = await getFires(params)
                     .then(res => res);
         
         console.log(res);
-        //setList(res);
-    }, [date]);
+        setList(res);
+    }
 
     const changeDate = ( dir ) => {
         setDate(new Date(
                     date.getFullYear(), 
                     date.getMonth(), 
                     date.getDate() + dir));
+        setDateDiff(dateDiff + dir);
     }
 
     return (
@@ -33,7 +44,7 @@ const PeopleList = ({ setDate, date }) => {
             </div>
             {
                 list.accounts.map((account) => (
-                    <PeopleListItem key={account.name} data={account}/>
+                    <PeopleListItem key={account.username} data={account} dateDiff={dateDiff}/>
                 ))
             }
         </div>

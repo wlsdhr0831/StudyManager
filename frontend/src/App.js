@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import Main from './pages/main/main';
 import './App.css';
-import Modal from './pages/modal/modal';
+import Modal from './components/modal/modal';
 
 const App = () => {
   const [modal, setModal] = useState(false);

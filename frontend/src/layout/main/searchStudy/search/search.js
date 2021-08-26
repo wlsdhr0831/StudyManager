@@ -1,6 +1,6 @@
 import React from 'react';
-import CalendarList from '../../../components/calendar/calendar';
-import Progress from '../../../components/progress/progress';
+import CalendarList from '../calendar/calendar';
+import Progress from '../progress/progress';
 import styles from './search.module.css';
 
 const Search = ({ date, changeDate }) => {

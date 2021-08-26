@@ -1,6 +1,6 @@
 import React from 'react';
-import Sign from '../sign/sign';
-import Setting from '../setting/setting';
+import Sign from '../../pages/sign/sign';
+import Setting from '../../pages/setting/setting';
 import styles from './modal.module.css';
 
 const Modal = ({ closeModal, component }) => {

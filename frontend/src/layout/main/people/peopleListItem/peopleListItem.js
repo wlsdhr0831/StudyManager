@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
 import styles from './peopleListItem.module.css';
 import Switch from "react-switch";
-import TimeList from '../timeList/timeList';
+import TimeList from '../../timeList/timeList';
 
-const PeopleListItem = ({ data, dateDiff }) => {
-    const [fire, setFire] = useState(false);
+const PeopleListItem = ({ data, today }) => {
+    const currUser = '';
 
     const handleChange = (checked) => {
         setFire( checked );
@@ -13,9 +13,9 @@ const PeopleListItem = ({ data, dateDiff }) => {
     return (
         <div className={styles.list_item}>
             <span className={styles.name}>{data.username}</span>
-            { dateDiff === 0 &&
+            { today &&
                 <Switch
-                // disabled={data.username === '' ? true : false}
+                disabled={data.username === currUser ? true : false}
                 checked={data.fireState === 'START' ? true : false}
                 onChange={handleChange}
                 onColor="#58b4ff"

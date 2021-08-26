@@ -1,21 +1,34 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import styles from './peopleListItem.module.css';
 import Switch from "react-switch";
 import TimeList from '../../timeList/timeList';
 
-const PeopleListItem = ({ data, today }) => {
-    const currUser = '';
+const PeopleListItem = ({ data, today, changeFire, timeList = [] }) => {
+    const currUser = '성진옥';
+    const [ hover, setHover ] = useState(false);
 
-    const handleChange = (checked) => {
-        setFire( checked );
+    const handleChange = () => {
+        changeFire( data.username, data.fireState );
+    }
+
+    const onMouseEnter = () => {
+        setHover(true);
+    }
+
+    const onMouseLeave = () => {
+        setHover(false);
     }
 
     return (
         <div className={styles.list_item}>
-            <span className={styles.name}>{data.username}</span>
+            <span 
+                className={styles.name}
+                onMouseEnter={onMouseEnter}
+                onMouseLeave={onMouseLeave}>
+                    {data.username}</span>
             { today &&
                 <Switch
-                disabled={data.username === currUser ? true : false}
+                disabled={data.username === currUser ? false : true}
                 checked={data.fireState === 'START' ? true : false}
                 onChange={handleChange}
                 onColor="#58b4ff"
@@ -28,10 +41,7 @@ const PeopleListItem = ({ data, today }) => {
                 width={48}
                 />
             }
-            <div className={styles.time_list}>
-                <TimeList/>
-            </div>
-            <hr/>
+            { hover && <TimeList timeList={timeList}/> }
         </div>
     );
 }

@@ -11,7 +11,7 @@ const PeopleList = ({ changeDate, date, today }) => {
 
     useEffect(() => {
         getList();
-
+        
     }, [date]);
 
     const getList = async () => {
@@ -31,6 +31,10 @@ const PeopleList = ({ changeDate, date, today }) => {
                     date.getDate() + dir));
     }
 
+    const changeFire = ( username, fireState ) => {
+        console.log(username, fireState );
+    }
+
     return (
         <div className={styles.list}>
             <div className={styles.list_head}>
@@ -39,11 +43,17 @@ const PeopleList = ({ changeDate, date, today }) => {
                 <span onClick={() => moveDate(1)}>👉🏻</span>
             </div>
             {
-                list.accounts.map((account) => (
-                    <PeopleListItem 
-                        key={account.username} 
-                        data={account} 
-                        today={today}/>
+                list.accounts.map((account, idx) => (
+                    <div key={account.username}>
+                        <PeopleListItem 
+                            key={account.username} 
+                            data={account} 
+                            today={today}
+                            changeFire={changeFire}
+                            timeList={list.fires[account.username]}
+                            />
+                        { idx + 1 < list.accounts.length && <hr/> }
+                    </div>
                 ))
             }
         </div>

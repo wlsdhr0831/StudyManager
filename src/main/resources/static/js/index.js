@@ -153,21 +153,30 @@ function doFire() {
 
 let stompClient = null;
 let loginUser = null;
+let loading = null;
 
 function connect() {
+   loading = $(loadingTemplate());
+   $("#loadings").append(loading);
    const socket = new SockJS("/connect");
    stompClient = Stomp.over(socket);
-   stompClient.connect({sender: loginUser}, onConnected, onError);
    stompClient.debug = null;
+   stompClient.connect({sender: loginUser}, onConnected, onError);
 }
 
-function onConnected() {
+function onConnected(event) {
+   console.log(event.command);
+
    stompClient.subscribe("/topic/fire/sync", onMessageReceived);
    stompClient.send("/ws/fire/sync.register", {}, JSON.stringify({sender: loginUser}));
+   loading.remove();
 }
 
 function onError(error) {
    console.log(error);
+
+   loading.remove();
+   setTimeout(connect, 5000);
 }
 
 function onMessageReceived(payload) {

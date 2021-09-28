@@ -24,13 +24,7 @@
 <input id="fire_state" type="hidden" value="${me.fireState}"/>
 <input id="today" type="hidden" value="${currentDate}"/>
 
-<div id="loading" style="display: none; z-index: 10;position: absolute; width: 100vw; height: 100vh; background-color: rgba(255, 255, 255, 0.5);">
-    <div class="d-flex justify-content-center align-items-center text-primary" style="width: 100%; height: 100%;">
-        <div class="spinner-border spinner-border-sm" role="status">
-            <span class="sr-only">Loading...</span>
-        </div>
-    </div>
-</div>
+<div id="loadings"></div>
 
 <div class="d-flex justify-content-center" style="padding-bottom: 15px; padding-top: 15px">
     <div style="width: 500px; max-width: 700px">

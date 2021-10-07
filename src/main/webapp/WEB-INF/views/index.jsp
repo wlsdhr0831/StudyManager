@@ -30,7 +30,10 @@
     <div style="width: 500px; max-width: 700px">
         <nav class="nav nav-pills nav-fill" style="margin-bottom: 15px;">
             <a class="nav-item"><button id="prevDate" class="left btn btn-secondary"><i class="bi bi-chevron-left"></i></button></a>
-            <a class="nav-item nav-link"><span id="current_date" class="text-secondary">${currentDate}</span></a>
+            <button class="nav-item nav-link btn btn-link"
+                    data-toggle="modal"
+                    data-target="#modal_calendar"
+            ><span id="current_date" class="text-secondary"><b>${currentDate}</b></span></button>
             <a class="nav-item"><button id="nextDate" class="right btn btn-secondary" disabled><i class="bi bi-chevron-right"></i></button></a>
         </nav>
 
@@ -38,6 +41,59 @@
         <div id="others_cards"></div>
     </div>
 </div>
+
+<div class="modal fade" id="modal_calendar" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLongTitle">
+<%--                    Modal title--%>
+                </h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div id="v-cal">
+                    <div class="vcal-header">
+                        <button class="vcal-btn" data-calendar-toggle="previous">
+                            <svg height="24" version="1.1" viewbox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M20,11V13H8L13.5,18.5L12.08,19.92L4.16,12L12.08,4.08L13.5,5.5L8,11H20Z"></path>
+                            </svg>
+                        </button>
+
+                        <div class="vcal-header__label" data-calendar-label="month">
+                            March 2017
+                        </div>
+
+                        <button class="vcal-btn" data-calendar-toggle="next">
+                            <svg height="24" version="1.1" viewbox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M4,11V13H16L10.5,18.5L11.92,19.92L19.84,12L11.92,4.08L10.5,5.5L16,11H4Z"></path>
+                            </svg>
+                        </button>
+                    </div>
+
+                    <div class="vcal-week">
+                        <span>Mon</span> <span>Tue</span><span>Wed</span> <span>Thu</span> <span>Fri</span> <span>Sat</span> <span>Sun</span>
+                    </div>
+                    <div class="vcal-body" data-calendar-area="month"></div>
+
+                </div>
+
+                <p class="demo-picked d-none">
+                    Date picked:
+                    <span data-calendar-label="picked"></span>
+                </p>
+            </div>
+<%--            <div class="modal-footer">--%>
+<%--                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>--%>
+<%--                <button type="button" class="btn btn-primary">Save changes</button>--%>
+<%--            </div>--%>
+        </div>
+    </div>
+</div>
+
+<div class="toast-container" style="z-index: 9999; position: absolute; top: 20px; right: 20px;"></div>
 
 </body>
 </html>

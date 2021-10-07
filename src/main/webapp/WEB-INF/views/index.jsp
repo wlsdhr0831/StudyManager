@@ -28,14 +28,15 @@
 
 <div class="d-flex justify-content-center" style="padding-bottom: 15px; padding-top: 15px">
     <div style="width: 500px; max-width: 700px">
-        <nav class="nav nav-pills nav-fill" style="margin-bottom: 15px;">
-            <a class="nav-item"><button id="prevDate" class="left btn btn-secondary"><i class="bi bi-chevron-left"></i></button></a>
-            <button class="nav-item nav-link btn btn-link"
+        <div class="btn-group" style="width: 100%; margin-bottom: 15px">
+            <button id="prevDate" class="left btn btn-secondary" style="width:10%"><i class="bi bi-chevron-left"></i></button>
+            <button class="btn btn-secondary"
+                    style="width: 80%;"
                     data-toggle="modal"
                     data-target="#modal_calendar"
-            ><span id="current_date" class="text-secondary"><b>${currentDate}</b></span></button>
-            <a class="nav-item"><button id="nextDate" class="right btn btn-secondary" disabled><i class="bi bi-chevron-right"></i></button></a>
-        </nav>
+            ><span id="current_date"><b>${currentDate}</b></span></button>
+            <button id="nextDate" class="btn btn-secondary" style="width:10%" disabled><i class="bi bi-chevron-right"></i></button>
+        </div>
 
         <div id="user_card"></div>
         <div id="others_cards"></div>

@@ -1,4 +1,5 @@
 let vanillaCalendar = null;
+let userInfo = {};
 
 $(function () {
     loginUser = $("#username").val();
@@ -13,13 +14,33 @@ $(function () {
         moveTo(sideDate(1));
     });
 
-    loadData($("#current_date").text());
     connect();
 
     setInterval(function() {
         $(".toast.fade.hide").remove();
     }, 5000);
 });
+
+function setEntireFires(username) {
+    let hasStudied = false;
+    loadingAjax({
+        url: `/fires/${username}`,
+        method: "GET",
+        async: false,
+        data: {
+            date: $("#current_date").text(),
+        },
+        success(data) {
+            hasStudied = data.length !== 0;
+            const modalBody = $("#modal_fires .modal-body").empty();
+
+            if(hasStudied) {
+                modalBody.append(fireListTemplate(data));
+            }
+        }
+    })
+    return hasStudied;
+}
 
 function sideDate(dir) {
     const currentDate = $("#current_date");
@@ -34,15 +55,23 @@ function sideDate(dir) {
 function moveTo(nextDate) {
     const currentDate = $("#current_date b")
     currentDate.text(nextDate);
-
     $("#nextDate").attr("disabled", $("#today").val() === currentDate.text());
-    $("#user_card").empty();
-    $("#others_cards").empty();
 
     loadData(nextDate);
 }
 
 function loadData(date) {
+    const userCardNode = $("#user_card");
+    const othersCardNode = $("#others_cards");
+
+    Object.keys(userInfo).forEach(key => {
+        clearInterval(userInfo[key].progressThreads);
+    });
+    userCardNode.empty();
+    othersCardNode.empty();
+
+    const isToday = date === $("#today").val();
+
     loadingAjax({
         url: "/fires",
         method: "GET",
@@ -50,117 +79,73 @@ function loadData(date) {
             date: date,
         },
         success(data) {
-            loadTemplate("fire-card-template.html", (cardTemplate) => {
-                appendCards(cardTemplate, data.accounts);
-                loadTemplate("timeline-template.html", (fireTemplate) => {
-                    appendFires(fireTemplate, data.fires);
-                });
-            });
-        },
-    })
-}
+            data.accounts.forEach(account => {
+                userInfo[account.username] = {};
 
-function loadTemplate(template, callback) {
-    loadingAjax({
-        url: "/" + template,
-        method: "GET",
-        success(data) {
-            callback(data);
-        },
-    })
-}
-
-function appendCards(template, accounts) {
-    const myName = $("#username").val();
-    const isToday = $("#current_date").text() === $("#today").val();
-
-    accounts.forEach((account) => {
-        const card = $(template.replaceAll("${username}", account.username));
-        const heading = card.find("#heading_" + account.username);
-        const additional = heading.find("#additional_" + account.username);
-        const hasStarted = account.fireState === "START";
-
-        if (account.username === myName) {
-            heading.find("h4").text("나");
-
-            if (isToday) {
-                additional.append(switchButton(myName));
-                additional.find(".switch").click(function (event) {
-                    event.stopPropagation();
-                });
-
-                const toggleBtn = additional.find("#toggle_" + myName);
-                toggleBtn.change(function () {
-                    doFire();
-                });
-                toggleBtn.prop("checked", hasStarted);
-            }
-            $("#user_card").html(card);
-
-        } else {
-            if (isToday) {
-                if (hasStarted) {
-                    additional.append(onBadge());
-                } else {
-                    additional.append(offBadge());
-                }
-            }
-            $("#others_cards").append(card);
-        }
-
-        if (isToday) {
-            loadingAjax({
-                url: "/fires/last",
-                method: "GET",
-                data: {
-                    username: account.username,
-                },
-                success(data) {
-                    if (data.fireType === "START") {
-                        additional.prepend(startedBadge(account.username, data.fireTime));
+                let runningTime = 0;
+                let fireState = "END";
+                data.fires[account.username]?.forEach(fire => {
+                    if(fire.end === null) {
+                        userInfo[account.username].startedAt = fire.fireTime;
+                        fireState = "START";
+                    }else {
+                        const startTime = new Date(fire.fireTime);
+                        const endTime = new Date(fire.end.fireTime);
+                        runningTime += endTime - startTime;
                     }
-                },
-            })
-        }
-    });
-}
+                });
+                userInfo[account.username].runningTime = runningTime;
 
-function appendFires(template, fires) {
-    Object.keys(fires).forEach(key => {
-        fires[key].forEach(fire => {
-            appendFire(template, fire, key);
-        })
-    });
-}
+                const card = $(userCardTemplate(account.username, fireState));
+                if(account.username === $("#username").val()) {
+                    userCardNode.append(card);
+                }else {
+                    othersCardNode.append(card);
+                }
+                const usernameButton = card.find("[data-target='#modal_fires']");
+                usernameButton.click((e) => {
+                    if(!setEntireFires(account.username)) {
+                        alertToast("Alert", "공부하면 보여줌", "just now");
+                        e.stopPropagation();
+                        e.preventDefault();
+                    }
+                });
 
-function appendFire(template, fire, username) {
-    const startTime = new Date(fire.fireTime);
-    const endTime = new Date(fire.end.fireTime);
-    const timeDiff = endTime - startTime;
-
-    const html = template
-        .replaceAll("${startTime}", moment(startTime).format("HH:mm:ss"))
-        .replaceAll("${endTime}", moment(endTime).format("HH:mm:ss"))
-        .replaceAll("${timeDiff}", moment.utc(timeDiff).format("HH시간 mm분 ss초"))
-    $("#card_body_" + username).append(html);
-
-    const totalTimestampNode = $("#total_timestamp_" + username);
-    const totalTimestamp = parseInt(totalTimestampNode.val()) + timeDiff;
-
-    $("#total_time_" + username).text(moment.utc(totalTimestamp).format("HH시간 mm분 ss초"));
-    totalTimestampNode.val(totalTimestamp);
+                updateProgress(account.username, runningTime);
+                if(isToday) {
+                    if (fireState === "START") {
+                        updateProgress(account.username, runningTime + (new Date() - new Date(userInfo[account.username].startedAt)));
+                        userInfo[account.username].progressThreads = setProgressInterval(account.username);
+                    }
+                }else {
+                    const isSucceeded = calculateProgressPercentage(runningTime) === 100;
+                    const resultIcon = isSucceeded ? `<i class="bi bi-check-lg"></i>` : `<i class="bi bi-x-lg"></i>`;
+                    const resultColor = isSucceeded ? "success" : "secondary";
+                    $(`#card_${account.username} .right-round`).empty().prop("class", "btn btn-" + resultColor + " right-round").html(resultIcon);
+                    if(isSucceeded) {
+                        $(`#card_${account.username} .progress-bar`).addClass("bg-success");
+                    }
+                }
+            });
+            if(isToday) $("#card_" + $("#username").val() + " .right-round").click(doFire);
+        },
+    })
 }
 
 function doFire() {
-    const fireState = $("#fire_state").val();
     loadingAjax({
         url: "/fires",
         method: "POST",
         success(data) {
             send(data);
+            if(data.dayOver) {
+                location.reload();
+            }
         },
-        error() {
-            $("#toggle_" + loginUser).prop("checked", fireState === "START");
+        statusCode: {
+            401: function() {
+                location.replace("/users/login");
+            }
         }
     });
 }
@@ -184,6 +169,8 @@ function onConnected(event) {
     stompClient.subscribe("/topic/fire/sync", onMessageReceived);
     stompClient.send("/ws/fire/sync.register", {}, JSON.stringify({sender: loginUser}));
     loading.remove();
+
+    loadData($("#current_date").text());
 }
 
 function onError(error) {
@@ -196,57 +183,25 @@ function onError(error) {
 function onMessageReceived(payload) {
     payload = JSON.parse(payload.body);
 
-    const additional = $("#additional_" + payload.sender);
+    const username = payload.sender;
+    const fireType = payload.fire.end == null ? "START" : "END";
+    $("#card_" + username).data("state", fireType);
 
-    if (payload.sender !== loginUser) {
-        if (payload.fire.end == null) {
-            additional.html(onBadge());
-        } else {
-            additional.html(offBadge());
-        }
-    }
-    if (payload.fire.end != null) {
-        loadTemplate("timeline-template.html", (fireTemplate) => {
-            appendFire(fireTemplate, payload.fire, payload.sender);
-            $("#started_" + payload.sender).remove();
-        });
-    } else {
-        additional.prepend(startedBadge(payload.sender, payload.fire.fireTime));
+    if(fireType === "START") {
+        userInfo[username].startedAt = payload.fire.fireTime;
+        updateProgress(username, userInfo[username].runningTime);
+        userInfo[username].progressThreads = setProgressInterval(username);
+    }else {
+        userInfo[username].runningTime += new Date() - new Date(userInfo[username].startedAt);
+        userInfo[username].startedAt = NaN;
+
+        clearInterval(userInfo[username].progressThreads);
+        updateProgress(username, userInfo[username].runningTime);
     }
 }
 
 function send(data) {
     stompClient.send("/ws/fire/sync.send", {}, JSON.stringify({fire: data.fire, sender: data.owner}));
-}
-
-// templates -------------------------------------------------------------------------------------------------------
-
-function switchButton(username) {
-    return `
-      <label class="switch right">
-         <input id="toggle_${username}" type="checkbox"/>
-         <span class="slider round"></span>
-      </label>
-   `;
-}
-
-function onBadge() {
-    return `
-    <span class="badge badge-success">On</span>   
-   `;
-}
-
-function offBadge() {
-    return `
-    <span class="badge badge-secondary">Off</span>
-   `;
-}
-
-function startedBadge(username, time) {
-    const formatTime = moment(new Date(time)).format("HH:mm:ss");
-    return `
-   <span id="started_${username}" class="badge badge-info" style="margin-right: 15px">` + formatTime + ` ~ </span>
-   `;
 }
 
 function toastTemplate(title, content, time) {
@@ -262,6 +217,180 @@ function toastTemplate(title, content, time) {
         </div>
     </div>
     `;
+}
+
+function userCardTemplate(username, fireState) {
+    return `
+    <div id="card_${username}" data-state="${fireState}" class="btn-group btn-group-lg" style="width: 100%;">
+        <button class="btn btn-light left-round" style="width: 40%" data-toggle="modal" data-target="#modal_fires">${username}</button>
+        <button id="progress_time_${username}" data-order="1" class="btn btn-light" style="width: 50%"></button>
+        <button id="start_time_${username}" data-order="2" class="btn btn-light" style="width: 50%; display: none"></button>
+        <button id="total_time_${username}" data-order="3" class="btn btn-light" style="width: 50%; display: none"></button>
+        ` +
+        (
+            username === $("#username").val() ?
+            `<button class="btn btn-primary right-round" style="width: 10%; font-size: 10pt"><i class="bi bi-play-fill"></i></button>` :
+            `<button class="btn btn-secondary right-round" style="width: 10%; font-size: 10pt"><b>Off</b></button>`
+        ) +
+        `
+        <div class="progress left-round cut-progress">
+            <div class="progress-bar progress-bar-striped bg-secondary" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" style="width: 0"></div>
+        </div>
+    </div>`;
+}
+
+function fireListTemplate(data) {
+    let fireListNode = $(`<ul class="list-group list-group-flush"></ul>`);
+
+    data.forEach(fire => {
+        const start = moment(fire.fireTime).subtract('hours', 9);
+        const end = fire.end ? moment(fire.end.fireTime).subtract('hours', 9) : null;
+        fireListNode.append(`
+            <li class="list-group-item d-flex justify-content-between">
+                <span>${start.format("HH:mm:ss ")} ~ ${end ? end.format("HH:mm:ss ") : `
+                    <div class="spinner-border spinner-border-sm ml-4" role="status">
+                        <span class="sr-only">Loading...</span>
+                    </div>`
+                }</span>` + (end ? `<i class="bi bi-arrow-right"></i>` + moment(end-start).subtract('hours', 9).format(" HH시간 mm분 ss초") : "") + `</li>`);
+    })
+    return fireListNode;
+}
+
+function updateButton(username) {
+    const state = $(`#card_${username}`).data("state");
+
+    if(username === $("#username").val()) {
+        if(state === "START") {
+            toStopButton();
+        }else {
+            toPlayButton();
+        }
+    }else {
+        if(state === "START") {
+            toOnButton(username);
+        }else {
+            toOffButton(username);
+        }
+    }
+}
+
+function toPlayButton() {
+    const buttonNode = $("#card_" + $("#username").val() + " .btn.right-round");
+    buttonNode.removeClass("btn-danger");
+    buttonNode.addClass("btn-primary");
+
+    const buttonNodeIcon = buttonNode.find("i");
+    buttonNodeIcon.removeClass("bi-stop-fill");
+    buttonNodeIcon.addClass("bi-play-fill");
+}
+
+function toStopButton() {
+    const buttonNode = $("#card_" + $("#username").val() + " .btn.right-round");
+    buttonNode.removeClass("btn-primary");
+    buttonNode.addClass("btn-danger");
+
+    const buttonNodeIcon = buttonNode.find("i");
+    buttonNodeIcon.removeClass("bi-play-fill");
+    buttonNodeIcon.addClass("bi-stop-fill");
+}
+
+function toOffButton(username) {
+    const buttonNode = $(`#card_${username} .btn.right-round`);
+    buttonNode.removeClass("btn-success");
+    buttonNode.addClass("btn-secondary");
+
+    const buttonNodeIcon = buttonNode.find("b");
+    buttonNodeIcon.text("Off");
+}
+
+function toOnButton(username) {
+    const buttonNode = $(`#card_${username} .btn.right-round`);
+    buttonNode.removeClass("btn-secondary");
+    buttonNode.addClass("btn-success");
+
+    const buttonNodeIcon = buttonNode.find("b");
+    buttonNodeIcon.text("On");
+}
+
+function setProgressInterval(username) {
+    return setInterval(() => {
+        updateProgress(username, userInfo[username].runningTime + (new Date() - new Date(userInfo[username].startedAt)));
+    }, 1000);
+}
+
+function updateProgress(username, runningTime) {
+    setProgressTime(username, runningTime);
+    updateButton(username);
+
+    const percentage = setProgressPercentage(username, runningTime);
+    const state = $(`#card_${username}`).data("state");
+
+    if(state === "START") {
+        if (percentage === 100) {
+            toExceedProgress(username);
+        } else {
+            toRunningProgress(username);
+        }
+    }else {
+        toStopProgress(username);
+    }
+}
+
+function setProgressTime(username, runningTime) {
+    $(`#progress_time_${username}`).text(moment.utc(runningTime).format("HH:mm:ss"));
+}
+
+function setProgressPercentage(username, runningTime) {
+    const percentage = calculateProgressPercentage(runningTime);
+    const progressNode = $(`#card_${username} .progress-bar`);
+
+    progressNode.prop("aria-valuenow", percentage);
+    progressNode.css("width", percentage + "%");
+
+    return percentage;
+}
+
+function getProgressPercentage(username) {
+    return $(`#card_${username} .progress-bar`).css("width");
+}
+
+function toRunningProgress(username) {
+    const progressNode = $(`#card_${username} .progress-bar`);
+    progressNode.removeClass("bg-success");
+    progressNode.removeClass("bg-secondary");
+    progressNode.addClass("bg-primary");
+    progressNode.addClass("progress-bar-animated");
+}
+
+function toExceedProgress(username) {
+    const progressNode = $(`#card_${username} .progress-bar`);
+    progressNode.removeClass("bg-secondary");
+    progressNode.removeClass("bg-primary");
+    progressNode.addClass("bg-success");
+    progressNode.addClass("progress-bar-animated");
+}
+
+function toStopProgress(username) {
+    const progressNode = $(`#card_${username} .progress-bar`);
+    progressNode.removeClass("bg-success");
+    progressNode.removeClass("bg-primary");
+    progressNode.addClass("bg-secondary");
+    progressNode.removeClass("progress-bar-animated");
+}
+
+function calculateProgressPercentage(runningSecond) {
+    const result = 100 * runningSecond / (3600 * 1000 * 2);
+
+    return result > 100 ? 100 : result;
+}
+
+function alertToast(title, message, time) {
+    const toast = $(toastTemplate(title, message, time));
+    $(".toast-container").append(toast);
+    toast.toast({
+        delay: 3000
+    });
+    toast.toast("show");
 }
 
 function getCalendarInstance() {
@@ -297,16 +426,11 @@ function getCalendarInstance() {
             this.activeDates = document.querySelectorAll('[data-calendar-status="active"]');
             for (var e = 0; e < this.activeDates.length; e++) this.activeDates[e].addEventListener("click", function (e) {
                 if(new Date(this.dataset.calendarDate) > new Date()) {
-                    const toast = $(toastTemplate("Alert", "아직 아니야", "just now"));
-                    $(".toast-container").append(toast);
-                    toast.toast({
-                        delay: 3000
-                    });
-                    toast.toast("show");
+                    alertToast("Alert", "아직 아니야", "just now");
 
                     return;
                 }
-                $("[data-toggle='modal']").click();
+                $("[data-target='#modal_calendar']").click();
                 document.querySelectorAll('[data-calendar-label="picked"]')[0].innerHTML = this.dataset.calendarDate;
                 // t.removeActiveClass();
                 // this.classList.add("vcal-date--selected");

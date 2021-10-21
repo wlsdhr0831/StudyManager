@@ -8,6 +8,7 @@ import java.util.List;
 
 @Repository
 public interface FireRepository extends JpaRepository<Fire, Long> {
-    List<Fire> findAllByFireDateAndFireTypeAndEnd_IdNotNull(LocalDate fireDate, FireType fireType);
+    List<Fire> findAllByFireDateAndFireType(LocalDate fireDate, FireType fireType);
+    List<Fire> findAllByAccount_UsernameAndFireDateAndFireTypeOrderByIdAsc(String username, LocalDate fireDate, FireType fireType);
     Fire findFirstByAccount_UsernameOrderByIdDesc(String username);
 }

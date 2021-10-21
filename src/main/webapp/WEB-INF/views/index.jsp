@@ -26,20 +26,22 @@
 
 <div id="loadings"></div>
 
-<div class="d-flex justify-content-center" style="padding-bottom: 15px; padding-top: 15px">
-    <div style="width: 500px; max-width: 700px">
-        <div class="btn-group" style="width: 100%; margin-bottom: 15px">
-            <button id="prevDate" class="left btn btn-secondary" style="width:10%"><i class="bi bi-chevron-left"></i></button>
-            <button class="btn btn-secondary"
-                    style="width: 80%;"
-                    data-toggle="modal"
-                    data-target="#modal_calendar"
-            ><span id="current_date"><b>${currentDate}</b></span></button>
-            <button id="nextDate" class="btn btn-secondary" style="width:10%" disabled><i class="bi bi-chevron-right"></i></button>
+<div class="d-flex justify-content-center" style="height: 100vh; background-color: #dde9ea">
+    <div style="width: 500px; max-width: 700px;">
+        <div class="btn-group-vertical" style="width: 100%">
+            <div class="btn-group btn-group-lg" style="width: 100%;">
+                <button id="prevDate" class="btn btn-light left-round" style="width:10%;"><i class="bi bi-chevron-left"></i></button>
+                <button class="btn btn-light"
+                        style="width: 80%;"
+                        data-toggle="modal"
+                        data-target="#modal_calendar"
+                ><span id="current_date"><b>${currentDate}</b></span></button>
+                <button id="nextDate" class="btn btn-light right-round" style="width:10%" disabled><i class="bi bi-chevron-right"></i></button>
+            </div>
+            <div id="user_card" style="width: 100%"></div>
+            <div id="others_cards" style="width: 100%"></div>
         </div>
 
-        <div id="user_card"></div>
-        <div id="others_cards"></div>
     </div>
 </div>
 
@@ -90,6 +92,28 @@
 <%--                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>--%>
 <%--                <button type="button" class="btn btn-primary">Save changes</button>--%>
 <%--            </div>--%>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="modal_fires" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    언제 했지?
+                </h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+
+            </div>
+            <%--            <div class="modal-footer">--%>
+            <%--                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>--%>
+            <%--                <button type="button" class="btn btn-primary">Save changes</button>--%>
+            <%--            </div>--%>
         </div>
     </div>
 </div>

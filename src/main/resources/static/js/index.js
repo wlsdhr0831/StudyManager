@@ -243,8 +243,8 @@ function fireListTemplate(data) {
     let fireListNode = $(`<ul class="list-group list-group-flush"></ul>`);
 
     data.forEach(fire => {
-        const start = moment(fire.fireTime).subtract('hours', 9);
-        const end = fire.end ? moment(fire.end.fireTime).subtract('hours', 9) : null;
+        const start = moment(fire.fireTime);
+        const end = fire.end ? moment(fire.end.fireTime) : null;
         fireListNode.append(`
             <li class="list-group-item d-flex justify-content-between">
                 <span>${start.format("HH:mm:ss ")} ~ ${end ? end.format("HH:mm:ss ") : `

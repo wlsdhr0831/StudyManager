@@ -1,5 +1,6 @@
 let vanillaCalendar = null;
 let userInfo = {};
+let historyUser = "";
 
 $(function () {
     loginUser = $("#username").val();
@@ -12,6 +13,19 @@ $(function () {
     });
     $("#nextDate").click(function () {
         moveTo(sideDate(1));
+    });
+    $('#modal_history').on('hidden.bs.modal', function (e) {
+        copyParagraphToInput();
+        showComment();
+    })
+    $("#comment").click(function(){
+        if(historyUser === $("#username").val()) {
+            copyParagraphToInput();
+            showCommentInput();
+        }
+    });
+    $("#comment_input button").click(function() {
+        updateComment();
     });
 
     connect();
@@ -28,25 +42,83 @@ $(function () {
     }, 1000);
 });
 
-function setEntireFires(username) {
-    let hasStudied = false;
+function updateComment() {
+    const commentNode = $("#comment_input input");
+    const comment = commentNode.val().trim();
+
+    loadingAjax({
+        url: "/comments",
+        method: "POST",
+        contentType: "application/json",
+        data: JSON.stringify({
+            username: $("#username").val(),
+            date: $("#current_date").text(),
+            comment: comment
+        }),
+        success(data) {
+            commentNode.val(comment);
+            copyInputToParagraph();
+            showComment();
+        }
+    });
+}
+
+function copyParagraphToInput() {
+    const comment = $("#comment");
+    const commentInputDiv = $("#comment_input");
+    const commentInput = commentInputDiv.find("input");
+
+    commentInput.val(comment.html() === "한줄 코멘트" ? "" : comment.html());
+}
+
+function copyInputToParagraph() {
+    const comment = $("#comment");
+    const commentInputDiv = $("#comment_input");
+    const commentInput = commentInputDiv.find("input");
+
+    comment.html(commentInput.val().trim() === "" ? "한줄 코멘트" : commentInput.val());
+}
+
+function showComment() {
+    $("#comment").show();
+    $("#comment_input").hide();
+}
+
+function showCommentInput() {
+    $("#comment").hide();
+    $("#comment_input").show();
+}
+
+function setEntireFires(username, studied, played) {
+    const date = $("#current_date").text();
     loadingAjax({
         url: `/fires/${username}`,
         method: "GET",
-        async: false,
         data: {
-            date: $("#current_date").text(),
+            date: date
         },
         success(data) {
-            hasStudied = data.length !== 0;
-            const modalBody = $("#modal_fires .modal-body").empty();
-
-            if(hasStudied) {
+            if(data.length !== 0) {
+                const modalBody = $("#modal_history .modal-body").empty();
                 modalBody.append(fireListTemplate(data));
+
+                loadingAjax({
+                    url: "/comments",
+                    method: "GET",
+                    data: {
+                        username: username,
+                        date: date
+                    },
+                    success(data) {
+                        $("#comment").html(data.comment ? data.comment : "한줄 코멘트");
+                        studied();
+                    }
+                })
+            }else {
+                played();
             }
         }
     })
-    return hasStudied;
 }
 
 function sideDate(dir) {
@@ -109,14 +181,15 @@ function loadData(date) {
                 }else {
                     othersCardNode.append(card);
                 }
-                const usernameButton = card.find("[data-target='#modal_fires']");
+                const usernameButton = card.find("#history_modal_btn")
 
-                usernameButton.click((e) => {
-                    if(!setEntireFires(account.username)) {
-                        alertToast("Alert", "공부하면 보여줌", "just now");
-                        e.stopPropagation();
-                        e.preventDefault();
-                    }
+                usernameButton.click(() => {
+                    historyUser = account.username;
+                    setEntireFires(
+                        account.username,
+                        () => $("#modal_history").modal("show"),
+                        () => alertToast("Alert", "공부하면 보여줌", "just now"),
+                    );
                 });
 
                 updateProgress(account.username, userInfo[account.username].runningTime + (fireState === "START" ? new Date(userInfo[account.username].startedAt) - new Date() : 0));
@@ -236,7 +309,7 @@ function toastTemplate(title, content, time) {
 function userCardTemplate(username, fireState) {
     return `
     <div id="card_${username}" data-state="${fireState}" class="btn-group btn-group-lg" style="width: 100%;">
-        <button class="btn btn-light left-round" style="width: 40%" data-toggle="modal" data-target="#modal_fires">${username}</button>
+        <button id="history_modal_btn" class="btn btn-light left-round" style="width: 40%">${username}</button>
         <button id="progress_time_${username}" data-order="1" class="btn btn-light" style="width: 50%"></button>
         <button id="start_time_${username}" data-order="2" class="btn btn-light" style="width: 50%; display: none"></button>
         <button id="total_time_${username}" data-order="3" class="btn btn-light" style="width: 50%; display: none"></button>
@@ -439,9 +512,8 @@ function getCalendarInstance() {
             var t = this;
             this.activeDates = document.querySelectorAll('[data-calendar-status="active"]');
             for (var e = 0; e < this.activeDates.length; e++) this.activeDates[e].addEventListener("click", function (e) {
-                if(new Date(this.dataset.calendarDate) > new Date()) {
+                if(moment(new Date(this.dataset.calendarDate)).format("yyyy-MM-DD") > moment(new Date($("#today").val())).format("yyyy-MM-DD")) {
                     alertToast("Alert", "아직 아니야", "just now");
-
                     return;
                 }
                 $("[data-target='#modal_calendar']").click();

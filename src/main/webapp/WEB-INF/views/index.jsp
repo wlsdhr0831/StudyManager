@@ -96,24 +96,29 @@
     </div>
 </div>
 
-<div class="modal fade" id="modal_fires" tabindex="-1" role="dialog" aria-hidden="true">
+<div class="modal fade" id="modal_history" tabindex="-1" role="dialog" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered" role="document">
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title">
                     언제 했지?
                 </h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close" onclick="$('#modal_history').modal('hide')">
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
             <div class="modal-body">
 
             </div>
-            <%--            <div class="modal-footer">--%>
-            <%--                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>--%>
-            <%--                <button type="button" class="btn btn-primary">Save changes</button>--%>
-            <%--            </div>--%>
+            <div class="modal-footer justify-content-start">
+                <p id="comment" style="cursor: pointer">한줄 코멘트</p>
+                <div id="comment_input" class="input-group mb-3" style="display: none">
+                    <input type="text" class="form-control" placeholder="한줄 코멘트">
+                    <div class="input-group-append">
+                        <button class="btn btn-outline-secondary" type="button">저장</button>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 </div>

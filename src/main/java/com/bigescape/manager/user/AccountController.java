@@ -1,5 +1,6 @@
 package com.bigescape.manager.user;
 
+import com.bigescape.manager.fire.FireType;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -48,6 +49,7 @@ public class AccountController {
     public ModelAndView register(@ModelAttribute Account account) {
         ModelAndView mav = new ModelAndView("/user/login");
 
+        account.setFireState(FireType.END);
         accountService.save(account);
 
         return mav;

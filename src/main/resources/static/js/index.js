@@ -19,6 +19,13 @@ $(function () {
     setInterval(function() {
         $(".toast.fade.hide").remove();
     }, 5000);
+    setInterval(() => {
+        Object.keys(userInfo).forEach(key => {
+           if($("#card_" + key).data("state") === "START") {
+               updateProgress(key, userInfo[key].runningTime + (new Date() - new Date(userInfo[key].startedAt)));
+           }
+        });
+    }, 1000);
 });
 
 function setEntireFires(username) {
@@ -64,9 +71,9 @@ function loadData(date) {
     const userCardNode = $("#user_card");
     const othersCardNode = $("#others_cards");
 
-    Object.keys(userInfo).forEach(key => {
-        clearInterval(userInfo[key].progressThreads);
-    });
+    // Object.keys(userInfo).forEach(key => {
+    //     clearInterval(userInfo[key].progressThreads);
+    // });
     userCardNode.empty();
     othersCardNode.empty();
 
@@ -103,6 +110,7 @@ function loadData(date) {
                     othersCardNode.append(card);
                 }
                 const usernameButton = card.find("[data-target='#modal_fires']");
+
                 usernameButton.click((e) => {
                     if(!setEntireFires(account.username)) {
                         alertToast("Alert", "공부하면 보여줌", "just now");
@@ -111,14 +119,14 @@ function loadData(date) {
                     }
                 });
 
-                updateProgress(account.username, runningTime);
+                updateProgress(account.username, userInfo[account.username].runningTime + (fireState === "START" ? new Date(userInfo[account.username].startedAt) - new Date() : 0));
                 if(isToday) {
-                    if (fireState === "START") {
-                        updateProgress(account.username, runningTime + (new Date() - new Date(userInfo[account.username].startedAt)));
-                        userInfo[account.username].progressThreads = setProgressInterval(account.username);
-                    }
+                    // if (fireState === "START") {
+                    //     updateProgress(account.username, runningTime + (new Date() - new Date(userInfo[account.username].startedAt)));
+                    //     userInfo[account.username].progressThreads = setProgressInterval(account.username);
+                    // }
                 }else {
-                    const isSucceeded = calculateProgressPercentage(runningTime) === 100;
+                    const isSucceeded = calculateProgressPercentage(userInfo[account.username].runningTime) === 100;
                     const resultIcon = isSucceeded ? `<i class="bi bi-check-lg"></i>` : `<i class="bi bi-x-lg"></i>`;
                     const resultColor = isSucceeded ? "success" : "secondary";
                     $(`#card_${account.username} .right-round`).empty().prop("class", "btn btn-" + resultColor + " right-round").html(resultIcon);
@@ -136,6 +144,9 @@ function doFire() {
     loadingAjax({
         url: "/fires",
         method: "POST",
+        data: {
+            now: new Date()
+        },
         success(data) {
             send(data);
             if(data.dayOver) {
@@ -181,27 +192,30 @@ function onError(error) {
 }
 
 function onMessageReceived(payload) {
-    payload = JSON.parse(payload.body);
+    const body = JSON.parse(payload.body);
+    const syncType = body.type;
 
-    const username = payload.sender;
-    const fireType = payload.fire.end == null ? "START" : "END";
-    $("#card_" + username).data("state", fireType);
+    if(syncType === "FIRED") {
+        const sender = body.sender;
+        const fireType = body.data.end == null ? "START" : "END";
+        $("#card_" + sender).data("state", fireType);
 
-    if(fireType === "START") {
-        userInfo[username].startedAt = payload.fire.fireTime;
-        updateProgress(username, userInfo[username].runningTime);
-        userInfo[username].progressThreads = setProgressInterval(username);
-    }else {
-        userInfo[username].runningTime += new Date() - new Date(userInfo[username].startedAt);
-        userInfo[username].startedAt = NaN;
-
-        clearInterval(userInfo[username].progressThreads);
-        updateProgress(username, userInfo[username].runningTime);
+        if (fireType === "START") {
+            userInfo[sender].startedAt = body.data.fireTime;
+            // updateProgress(sender, userInfo[sender].runningTime);
+            // userInfo[sender].progressThreads = setProgressInterval(sender);
+        } else {
+            userInfo[sender].runningTime += new Date(body.data.end.fireTime) - new Date(body.data.fireTime);
+            userInfo[sender].startedAt = NaN;
+            // clearInterval(userInfo[sender].progressThreads);
+            // updateProgress(sender, userInfo[sender].runningTime);
+        }
+        updateProgress(sender, userInfo[sender].runningTime);
     }
 }
 
 function send(data) {
-    stompClient.send("/ws/fire/sync.send", {}, JSON.stringify({fire: data.fire, sender: data.owner}));
+    stompClient.send("/ws/fire/sync.send", {}, JSON.stringify({sender: data.owner, type: "FIRED", data: data.fire}));
 }
 
 function toastTemplate(title, content, time) {
@@ -312,11 +326,11 @@ function toOnButton(username) {
     buttonNodeIcon.text("On");
 }
 
-function setProgressInterval(username) {
-    return setInterval(() => {
-        updateProgress(username, userInfo[username].runningTime + (new Date() - new Date(userInfo[username].startedAt)));
-    }, 1000);
-}
+// function setProgressInterval(username) {
+//     return setInterval(() => {
+//         updateProgress(username, userInfo[username].runningTime + (new Date() - new Date(userInfo[username].startedAt)));
+//     }, 1000);
+// }
 
 function updateProgress(username, runningTime) {
     setProgressTime(username, runningTime);

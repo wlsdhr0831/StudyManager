@@ -7,14 +7,18 @@ import com.bigescape.manager.user.Account;
 import com.bigescape.manager.user.AccountService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.format.datetime.standard.DateTimeFormatterFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpSession;
 import java.nio.file.Path;
+import java.sql.Timestamp;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -57,13 +61,13 @@ public class FireController {
     }
 
     @PostMapping
-    public ResponseEntity doFire(HttpSession session)  {
+    public ResponseEntity doFire(@RequestParam Date now, HttpSession session)  {
         Account loginUser = (Account) session.getAttribute("me");
         if(loginUser == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
 
-        return ResponseEntity.ok(fireService.doFire(loginUser));
+        return ResponseEntity.ok(fireService.doFire(loginUser, new Timestamp(now.getTime()).toLocalDateTime()));
     }
 
     @GetMapping("/last")

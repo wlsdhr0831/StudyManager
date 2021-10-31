@@ -1,6 +1,5 @@
 package com.bigescape.manager.sync;
 
-import com.bigescape.manager.fire.Fire;
 import lombok.*;
 
 @Getter
@@ -8,7 +7,8 @@ import lombok.*;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class Sync {
+public class Sync<T> {
     private String sender;
-    private Fire fire;
+    private SyncType type;
+    private T data;
 }

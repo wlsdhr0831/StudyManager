@@ -19,7 +19,7 @@ public class FireService {
         this.fireRepository = fireRepository;
     }
 
-    public FireResponse doFire(Account loginUser) {
+    public FireResponse doFire(Account loginUser, LocalDateTime now) {
         Fire lastFire = fireRepository.findFirstByAccount_UsernameOrderByIdDesc(loginUser.getUsername());
 
         FireType nextFireType = lastFire == null ? FireType.START : lastFire.getFireType().next();
@@ -28,7 +28,7 @@ public class FireService {
                 .account(loginUser)
                 .fireDate(FireType.END.equals(nextFireType) ? lastFire.getFireDate() : DateAdjuster.officialToday())
                 .fireType(nextFireType)
-                .fireTime(LocalDateTime.now())
+                .fireTime(now)
                 .build();
 
         Fire result = fireRepository.save(fire);

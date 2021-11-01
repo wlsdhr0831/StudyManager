@@ -143,9 +143,6 @@ function loadData(date) {
     const userCardNode = $("#user_card");
     const othersCardNode = $("#others_cards");
 
-    // Object.keys(userInfo).forEach(key => {
-    //     clearInterval(userInfo[key].progressThreads);
-    // });
     userCardNode.empty();
     othersCardNode.empty();
 
@@ -192,12 +189,9 @@ function loadData(date) {
                     );
                 });
 
-                updateProgress(account.username, userInfo[account.username].runningTime + (fireState === "START" ? new Date(userInfo[account.username].startedAt) - new Date() : 0));
+                updateProgress(account.username, userInfo[account.username].runningTime + (fireState === "START" ? new Date() - new Date(userInfo[account.username].startedAt) : 0));
                 if(isToday) {
-                    // if (fireState === "START") {
-                    //     updateProgress(account.username, runningTime + (new Date() - new Date(userInfo[account.username].startedAt)));
-                    //     userInfo[account.username].progressThreads = setProgressInterval(account.username);
-                    // }
+
                 }else {
                     const isSucceeded = calculateProgressPercentage(userInfo[account.username].runningTime) === 100;
                     const resultIcon = isSucceeded ? `<i class="bi bi-check-lg"></i>` : `<i class="bi bi-x-lg"></i>`;
@@ -275,13 +269,9 @@ function onMessageReceived(payload) {
 
         if (fireType === "START") {
             userInfo[sender].startedAt = body.data.fireTime;
-            // updateProgress(sender, userInfo[sender].runningTime);
-            // userInfo[sender].progressThreads = setProgressInterval(sender);
         } else {
             userInfo[sender].runningTime += new Date(body.data.end.fireTime) - new Date(body.data.fireTime);
             userInfo[sender].startedAt = NaN;
-            // clearInterval(userInfo[sender].progressThreads);
-            // updateProgress(sender, userInfo[sender].runningTime);
         }
         updateProgress(sender, userInfo[sender].runningTime);
     }
@@ -399,12 +389,6 @@ function toOnButton(username) {
     buttonNodeIcon.text("On");
 }
 
-// function setProgressInterval(username) {
-//     return setInterval(() => {
-//         updateProgress(username, userInfo[username].runningTime + (new Date() - new Date(userInfo[username].startedAt)));
-//     }, 1000);
-// }
-
 function updateProgress(username, runningTime) {
     setProgressTime(username, runningTime);
     updateButton(username);
@@ -518,8 +502,6 @@ function getCalendarInstance() {
                 }
                 $("[data-target='#modal_calendar']").click();
                 document.querySelectorAll('[data-calendar-label="picked"]')[0].innerHTML = this.dataset.calendarDate;
-                // t.removeActiveClass();
-                // this.classList.add("vcal-date--selected");
 
                 const nextDate = moment(this.dataset.calendarDate).format("yyyy-MM-DD");
                 moveTo(nextDate);

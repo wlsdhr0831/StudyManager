@@ -13,6 +13,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.socket.messaging.SessionConnectedEvent;
 import org.springframework.web.socket.messaging.SessionDisconnectEvent;
 
+import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -44,7 +45,7 @@ public class WebSocketEventListener {
         Fire lastFired = fireService.getLastFiredByName(username);
 
         if(lastFired != null && FireType.START.equals(lastFired.getFireType())) {
-            asyncService.checkLeave(sessionIdMap, username);
+            asyncService.checkLeave(sessionIdMap, username, LocalDateTime.now());
         }
     }
 }

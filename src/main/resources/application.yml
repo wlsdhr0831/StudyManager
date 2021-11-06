@@ -60,5 +60,11 @@ spring:
     serialization:
       FAIL_ON_EMPTY_BEANS: false
 
+  session:
+    store-type: jdbc
+    jdbc:
+      initialize-schema: always
+    timeout: -1
+
 server:
   port: 8099

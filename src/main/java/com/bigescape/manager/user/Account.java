@@ -3,20 +3,17 @@ package com.bigescape.manager.user;
 import com.bigescape.manager.fire.FireType;
 import lombok.*;
 import org.hibernate.annotations.ColumnDefault;
-import org.hibernate.annotations.DynamicInsert;
-import org.hibernate.annotations.DynamicUpdate;
 
 import javax.persistence.*;
+import java.io.Serializable;
 
 @Entity
 @Getter @Setter
 @Builder
 @ToString
-@DynamicInsert
-@DynamicUpdate
 @NoArgsConstructor
 @AllArgsConstructor
-public class Account {
+public class Account implements Serializable {
     @Id
     private String username;
     @Column(nullable = false)

@@ -24,28 +24,6 @@ public class AsyncService {
     private final AccountService accountService;
     private final FireService fireService;
 
-//    @Async("threadPoolExecutor")
-//    public void echoTime() {
-//        while(true) {
-//            LocalDateTime now = LocalDateTime.now();
-//            simpMessagingTemplate.convertAndSend("/topic/fire/sync",
-//                    Sync.builder()
-//                            .sender("ADMIN")
-//                            .type(SyncType.TIME)
-//                            .data(now)
-//                            .build()
-//            );
-//
-//            log.info("Echo Now TIME :: {}", now);
-//
-//            try {
-//                Thread.sleep(1000);
-//            } catch (InterruptedException e) {
-//                e.printStackTrace();
-//            }
-//        }
-//    }
-
     @Async("threadPoolExecutor")
     public void checkLeave(Map<String, String> sessionIdMap, String username, LocalDateTime disconnectedTime) {
         long start = Timestamp.valueOf(disconnectedTime).getTime();
@@ -73,6 +51,7 @@ public class AsyncService {
                             .type(SyncType.FIRED)
                             .data(finish.getFire())
                             .build());
+            log.info("{} 강제 종료...", username);
         }
     }
 }

@@ -23,7 +23,7 @@ const Sign = () => {
         }
 
         console.log("로그인 요청", userInfo);
-        // sign(userInfo);
+        sign(userInfo);
     };
 
     const onChange = (e) => {

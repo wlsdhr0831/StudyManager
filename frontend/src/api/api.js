@@ -4,7 +4,11 @@ import axios from 'axios';
 const BASE_URL = '';
 
 export const sign = async ({ username, userPw }) => (
-    await axios.post(`${BASE_URL}/users/login`, { username, userPw })
+    await axios.post(`${BASE_URL}/users/login?username=${username}&userPw=${userPw}`, { 
+            params: {
+                username, userPw
+            }, 
+        })
         .then(() => true)
         .catch(() => false)
 )
